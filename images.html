@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery with Upload & Classification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2575fc;
+        }
+        
+        .upload-btn {
+            padding: 12px 24px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background-color: #1a68e8;
+            transform: translateY(-2px);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background-color: white;
+            border: 2px solid #2575fc;
+            color: #2575fc;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            background-color: #e8f0fe;
+        }
+        
+        .filter-btn.active {
+            background-color: #2575fc;
+            color: white;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .gallery-item {
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: white;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .gallery-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            border-radius: 0;
+        }
+        
+        .gallery-info {
+            padding: 15px;
+        }
+        
+        .gallery-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .gallery-category, .gallery-gender {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .category-animals {
+            background-color: #e8f0fe;
+            color: #2575fc;
+        }
+        
+        .category-plants {
+            background-color: #e6f7ed;
+            color: #2e7d32;
+        }
+        
+        .category-landscapes {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .category-architecture {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .category-abstract {
+            background-color: #e0f2f1;
+            color: #00695c;
+        }
+        
+        .gender-male {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .gender-female {
+            background-color: #fce4ec;
+            color: #c2185b;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-form {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-btn {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Image Gallery</h1>
+        <p class="subtitle">Upload and explore images organized by categories and gender</p>
+    </header>
+    
+    <div class="container">
+        <!-- Upload Section -->
+        <section class="upload-section">
+            <h2 style="margin-bottom: 1.5rem;">Upload New Image</h2>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label for="imageTitle">Image Title</label>
+                    <input type="text" id="imageTitle" placeholder="Enter image title" required>
+                </div>
+                <div class="form-group">
+                    <label for="imageCategory">Category</label>
+                    <select id="imageCategory" required>
+                        <option value="">Select category</option>
+                        <option value="animals">Animals</option>
+                        <option value="plants">Plants</option>
+                        <option value="landscapes">Landscapes</option>
+                        <option value="architecture">Architecture</option>
+                        <option value="abstract">Abstract</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="imageGender">Gender</label>
+                    <select id="imageGender" required>
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="imageUpload">Upload Image</label>
+                    <input type="file" id="imageUpload" accept="image/*" required>
+                </div>
+                <button type="submit" class="upload-btn">Upload Image</button>
+            </form>
+        </section>
+        
+        <!-- Filter Section -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All Images</button>
+            <button class="filter-btn" data-filter="animals">Animals</button>
+            <button class="filter-btn" data-filter="plants">Plants</button>
+            <button class="filter-btn" data-filter="landscapes">Landscapes</button>
+            <button class="filter-btn" data-filter="architecture">Architecture</button>
+            <button class="filter-btn" data-filter="abstract">Abstract</button>
+            <button class="filter-btn" data-filter="male">Male</button>
+            <button class="filter-btn" data-filter="female">Female</button>
+        </div>
+        
+        <!-- Gallery Section -->
+        <div class="gallery" id="imageGallery">
+            <!-- Images will be dynamically added here -->
+        </div>
+    </div>
+    
+    <footer>
+        <p>Image Gallery &copy; 2023 | Upload and share your images</p>
+    </footer>
+    
+    <script>
+        // Sample initial images
+        const initialImages = [
+            {
+                id: 1,
+                title: "Majestic Lion",
+                category: "animals",
+                gender: "male",
+                src: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            },
+            {
+                id: 2,
+                title: "African Elephant",
+                category: "animals",
+                gender: "female",
+                src: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            },
+            {
+                id: 3,
+                title: "Colorful Succulents",
+                category: "plants",
+                gender: "female",
+                src: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            },
+            {
+                id: 4,
+                title: "Snowy Mountain Peak",
+                category: "landscapes",
+                gender: "male",
+                src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            },
+            {
+                id: 5,
+                title: "Modern Architecture",
+                category: "architecture",
+                gender: "male",
+                src: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            },
+            {
+                id: 6,
+                title: "Colorful Abstraction",
+                category: "abstract",
+                gender: "female",
+                src: "https://images.unsplash.com/photo-1543857778-c4a1a569eebe?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+            }
+        ];
+
+        let images = [...initialImages];
+        let nextId = 7;
+
+        // Initialize gallery
+        document.addEventListener('DOMContentLoaded', function() {
+            renderGallery();
+            setupEventListeners();
+        });
+
+        function renderGallery(filter = 'all') {
+            const gallery = document.getElementById('imageGallery');
+            gallery.innerHTML = '';
+
+            const filteredImages = images.filter(image => {
+                if (filter === 'all') return true;
+                return image.category === filter || image.gender === filter;
+            });
+
+            if (filteredImages.length === 0) {
+                gallery.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 2rem;">No images found for this filter.</p>';
+                return;
+            }
+
+            filteredImages.forEach(image => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.setAttribute('data-category', image.category);
+                galleryItem.setAttribute('data-gender', image.gender);
+
+                galleryItem.innerHTML = `
+                    <img src="${image.src}" alt="${image.title}" class="gallery-img">
+                    <div class="gallery-info">
+                        <h3 class="gallery-title">${image.title}</h3>
+                        <div class="gallery-meta">
+                            <span class="gallery-category category-${image.category}">${image.category}</span>
+                            <span class="gallery-gender gender-${image.gender}">${image.gender}</span>
+                        </div>
+                    </div>
+                `;
+
+                gallery.appendChild(galleryItem);
+            });
+        }
+
+        function setupEventListeners() {
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    const filterValue = this.getAttribute('data-filter');
+                    renderGallery(filterValue);
+                });
+            });
+
+            // Upload form
+            const uploadForm = document.getElementById('uploadForm');
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('imageTitle').value;
+                const category = document.getElementById('imageCategory').value;
+                const gender = document.getElementById('imageGender').value;
+                const fileInput = document.getElementById('imageUpload');
+                
+                if (!fileInput.files[0]) {
+                    alert('Please select an image to upload.');
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const newImage = {
+                        id: nextId++,
+                        title: title,
+                        category: category,
+                        gender: gender,
+                        src: e.target.result
+                    };
+
+                    images.push(newImage);
+                    renderGallery();
+                    
+                    // Reset form
+                    uploadForm.reset();
+                    
+                    alert('Image uploaded successfully!');
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>
